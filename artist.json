@@ -5,7 +5,7 @@
             "team" : "ISD",
             "name" : "이세계아이돌",
             "date" : "2021-12-17",
-            "profile" : "http://219.241.14.3:41309/api/music-server/img/artist/isd.bmp"
+            "profile" : "https://api.larang.dev/api/music-server/img/artist/isd.bmp"
         },
         {
             "id" : "STH",
