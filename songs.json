@@ -32,7 +32,7 @@
         "title": "겨울봄(Winter Spring)",
         "artist": "ISD",
         "file": "winter_Spring.mp3",
-        "streamUrl": "https://api.larang.dev/api/music-server/music/winter_Spring.mp3",
+        "streamUrl": "https://api.larang.dev/api/music-server/music/winter_spring.mp3",
         "date" : "2023-03-11",
         "img" : "https://api.larang.dev/api/music-server/img/song/winter_spring.bmp"
       },
