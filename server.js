@@ -24,10 +24,11 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-app.use('/api/music-server/music', express.static(path.join(__dirname, '/music')));
-app.use('/api/music-server/img/song', express.static(path.join(__dirname, '/img/song')));
-app.use('/api/music-server/img/artist', express.static(path.join(__dirname, '/img/artist')));
+app.use('/api/music-server/music', express.static(path.join(__dirname, '/api/music_server/music')));
+app.use('/api/music-server/img/song', express.static(path.join(__dirname, '/api/music_server/img/song')));
+app.use('/api/music-server/img/artist', express.static(path.join(__dirname, '/api/music_server/img/artist')));
 app.use('/song/', express.static(path.join(__dirname, '/page/song')));
+app.use('/document/', express.static(path.join(__dirname, '/page/document')));
 
 // Main page
 app.get('/', (req, res) => {
@@ -42,7 +43,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Song page
+// music-api
 app.get('/api/music-server', (req, res) => {
   const songPagePath = path.join(__dirname, './page/music_server.html');
   fs.readFile(songPagePath, 'utf8', (err, data) => {
@@ -55,7 +56,7 @@ app.get('/api/music-server', (req, res) => {
   });
 });
 
-// API routes
+// music-api/songs
 app.get('/api/music-server/songs', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM songs');
@@ -66,6 +67,8 @@ app.get('/api/music-server/songs', async (req, res) => {
   }
 });
 
+
+// music-api/artists
 app.get('/api/music-server/artists', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM artists');
