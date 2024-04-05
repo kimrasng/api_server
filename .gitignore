@@ -2,3 +2,4 @@
 
 # Ignore dotenv files
 .env
+api/music_server*
