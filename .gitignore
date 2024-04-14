@@ -2,6 +2,7 @@
 
 # Ignore dotenv files
 .env
-api/music_server/img/artist*
-api/music_server/img/songs*
-api/music_server/img/music*
+api/music_server/img/artist/
+api/music_server/img/songs/
+api/music_server/img/music/
+node_modules/

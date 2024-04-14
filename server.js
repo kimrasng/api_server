@@ -69,6 +69,22 @@ app.get('/api/music-server/songs', async (req, res) => {
   }
 });
 
+// music-api/songs/:id/stream
+app.get('/api/music-server/songs/:id/stream', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await pool.query('SELECT filename FROM songs WHERE id = ?', [id]);
+    const filename = rows[0].filename;
+    const filePath = path.join(__dirname, '/api/music_server/music', filename);
+
+    res.sendFile(filePath);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
 // music-api/artists
 app.get('/api/music-server/artists', async (req, res) => {
   try {
