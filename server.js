@@ -14,14 +14,14 @@ app.use(cors());
 
 // MySQL 연결 풀 생성
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  port: process.env.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    port: process.env.DB_PORT,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 // 페이지 연결
@@ -33,71 +33,71 @@ app.use('/document/', express.static(path.join(__dirname, '/page/document')));
 
 // Main page
 app.get('/', (req, res) => {
-  const mainPagePath = path.join(__dirname, './page/main.html');
-  fs.readFile(mainPagePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error', details: err.message });
-      return;
-    }
-    res.send(data);
-  });
+    const mainPagePath = path.join(__dirname, './page/main.html');
+    fs.readFile(mainPagePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error', details: err.message });
+            return;
+        }
+        res.send(data);
+    });
 });
 
 // music-api
 app.get('/api/music-server', (req, res) => {
-  const songPagePath = path.join(__dirname, './page/music_server.html');
-  fs.readFile(songPagePath, 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error', details: err.message });
-      return;
-    }
-    res.send(data);
-  });
+    const songPagePath = path.join(__dirname, './page/music_server.html');
+    fs.readFile(songPagePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal Server Error', details: err.message });
+            return;
+        }
+        res.send(data);
+    });
 });
 
 // music-api/songs
 app.get('/api/music-server/songs', async (req, res) => {
-  try {
-    let orderBy = req.query.orderBy || 'id';
-    const [rows] = await pool.query(`SELECT * FROM songs ORDER BY ${orderBy}`);
-    res.json({ songs: rows });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
-  }
+    try {
+        let orderBy = req.query.orderBy || 'id';
+        const [rows] = await pool.query(`SELECT * FROM songs ORDER BY ${orderBy}`);
+        res.json({ songs: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
 });
 
 // music-api/songs/:id/stream
 app.get('/api/music-server/songs/:id/stream', async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    const [rows] = await pool.query('SELECT filename FROM songs WHERE id = ?', [id]);
-    const filename = rows[0].filename;
-    const filePath = path.join(__dirname, '/api/music_server/music', filename);
+    try {
+        const [rows] = await pool.query('SELECT filename FROM songs WHERE id = ?', [id]);
+        const filename = rows[0].filename;
+        const filePath = path.join(__dirname, '/api/music_server/music', filename);
 
-    res.sendFile(filePath);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
-  }
+        res.sendFile(filePath);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
 });
 
 // music-api/artists
 app.get('/api/music-server/artists', async (req, res) => {
-  try {
-    let orderBy = req.query.orderBy || 'id';
-    const [rows] = await pool.query(`SELECT * FROM artists ORDER BY ${orderBy}`);
-    res.json({ artists: rows });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
-  }
+    try {
+        let orderBy = req.query.orderBy || 'id';
+        const [rows] = await pool.query(`SELECT * FROM artists ORDER BY ${orderBy}`);
+        res.json({ artists: rows });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    }
 });
 
 // HTTP server start
 http.createServer(app).listen(PORT, () => {
-  console.log(`HTTP server started on port ${PORT}`);
+    console.log(`HTTP server started on port ${PORT}`);
 });
