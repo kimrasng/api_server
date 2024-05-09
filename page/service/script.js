@@ -1,114 +1,113 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const songList = document.getElementById('song-list');
-    const paginationContainer = document.getElementById('pagination');
-    let currentPage = 1;
-    let songsPerPage = 10;
-    let currentSongIndex = 0;
-    let isPlaying = false; // 노래가 실행 여부
+let songTitle = "No Song";
+let artistName = "None";
+let songImage = "";
+let songList = [];
+let songListBack = [];
+let songAudio;
+let searchValue = "";
+let now;
+let currentSort = 'title';
+let currentOrder = 'asc';
 
-    const playNextSong = () => {
-        const songs = songList.querySelectorAll('li');
-        const nextSongIndex = (currentSongIndex + 1) % songs.length;
-        const nextSong = songs[nextSongIndex];
+const playSong = async () => {
+    const res = await fetch('https://api.kimrasng.kro.kr/api/music-server/songs/artist/asc');
+    const data = await res.json();
+    songList = data.songs;
+    songListBack = [...songList];
+    await sortSongs(currentSort, currentOrder);
+};
 
-        if (nextSongIndex === 0) {
-            currentPage++;
-            fetchAndRenderSongs();
+const click = async (id) => {
+    const song = songList.find(song => song.id === id);
+    if (song) {
+        songAudio = `https://api.kimrasng.kro.kr/api/music-server/music/${song.filename}`;
+        songImage = `https://api.kimrasng.kro.kr/api/music-server/img/song/${song.image_filename}`;
+        songTitle = song.title;
+        artistName = song.artist_name;
+        renderCurrentSong();
+    }
+};
+
+const audioPlayer = document.getElementById("audio-player");
+if(audioPlayer) {
+    audioPlayer.addEventListener("ended", async () => {
+        if (now === undefined) {
+            now = 0;
         }
-
-        nextSong.click();
-    };
-
-    const playSong = (song) => {
-        const audioPlayer = document.getElementById('audio-player');
-        const songTitle = document.getElementById('song-title');
-        const artistName = document.getElementById('artist-name');
-        const songImage = document.getElementById('song-image');
-
-        audioPlayer.src = `https://api.kimrasng.kro.kr/api/music-server/music/${song.filename}`;
-        songTitle.textContent = `${song.title}`;
-        artistName.textContent = `Artist: ${song.artist_name}`;
-
-        if (song.image_filename) {
-            songImage.src = `https://api.kimrasng.kro.kr/api/music-server/img/song/${song.image_filename}`;
+        if (now < songList.length) {
+            await click(songList[now].id);
+            now++;
         } else {
-            songImage.src = 'placeholder_image.jpg';
+            now = 0;
         }
+    });
+}
 
-        audioPlayer.play();
-        isPlaying = true; // 노래가 재생 중
-    };
+const search = async () => {
+    songList = songListBack.filter(song => song.title.toLowerCase().includes(searchValue.toLowerCase()));
+    songList = songList.concat(songListBack.filter(song => song.artist_name.toLowerCase().includes(searchValue.toLowerCase())));
+    await renderSongList();
+};
 
-    const renderSongs = (songs) => {
-        songList.innerHTML = '';
-        const startIndex = (currentPage - 1) * songsPerPage;
-        const endIndex = startIndex + songsPerPage;
-        const currentSongs = songs.slice(startIndex, endIndex);
-        currentSongs.forEach((song, index) => {
-            const li = document.createElement('li');
-            li.textContent = `${song.title}`;
-            const artistSpan = document.createElement('span');
-            artistSpan.textContent = `${song.artist_name}`;
-            li.appendChild(artistSpan);
-            li.addEventListener('click', () => {
-                currentSongIndex = index + startIndex;
-                playSong(song);
-            });
-            songList.appendChild(li);
-        });
-        renderPagination(songs.length);
-    };
-
-    const renderPagination = (totalSongs) => {
-        paginationContainer.innerHTML = '';
-        const totalPages = Math.ceil(totalSongs / songsPerPage);
-        for (let i = 1; i <= totalPages; i++) {
-            const button = document.createElement('button');
-            button.textContent = i;
-            button.addEventListener('click', () => {
-                currentPage = i;
-                fetchAndRenderSongs();
-            });
-            paginationContainer.appendChild(button);
+const sortSongs = async (sort, order) => {
+    let sortedSongs = [...songList];
+    sortedSongs.sort((a, b) => {
+        const x = a[sort].toLowerCase();
+        const y = b[sort].toLowerCase();
+        if (x < y) {
+            return order === 'asc' ? -1 : 1;
         }
-    };
+        if (x > y) {
+            return order === 'asc' ? 1 : -1;
+        }
+        return 0;
+    });
+    songList = sortedSongs;
+    await renderSongList();
+};
 
-    const fetchAndRenderSongs = () => {
-        fetch(`https://api.kimrasng.kro.kr/api/music-server/songs`)
-            .then(response => response.json())
-            .then(data => {
-                renderSongs(data.songs);
-                const audioPlayer = document.getElementById('audio-player');
-                audioPlayer.addEventListener('ended', () => {
-                    isPlaying = false; // 노래가 끝났으므로 재생 중이 아님을 표시
-                    playNextSong();
-                });
-            })
-            .catch(error => console.error('Error fetching songs:', error));
-    };
+const renderCurrentSong = () => {
+    document.getElementById("song-title").innerText = songTitle;
+    document.getElementById("artist-name").innerText = artistName;
+    document.getElementById("song-image").src = songImage;
+    document.getElementById("audio-player").src = songAudio;
+};
 
-    fetchAndRenderSongs();
+const renderSongList = async () => {
+    const songListContainer = document.getElementById("song-list");
+    if(!songListContainer) return;
 
-    const searchInput = document.getElementById('search-input');
-    searchInput.addEventListener('input', () => {
-        const searchValue = searchInput.value.toLowerCase();
-        currentPage = 1;
-        fetch(`https://api.kimrasng.kro.kr/api/music-server/songs`)
-            .then(response => response.json())
-            .then(data => {
-                const filteredSongs = data.songs.filter(song => {
-                    return song.title.toLowerCase().includes(searchValue) || song.artist_name.toLowerCase().includes(searchValue);
-                });
-                renderSongs(filteredSongs);
-            })
-            .catch(error => console.error('Error searching songs:', error));
+    songListContainer.innerHTML = "";
+
+    const table = document.createElement("table");
+    table.classList.add("song-table");
+
+    const tableHeader = table.createTHead();
+    const headerRow = tableHeader.insertRow();
+    const thTitle = document.createElement("th");
+    thTitle.textContent = "Title";
+    const thArtist = document.createElement("th");
+    thArtist.textContent = "Artist";
+    const thDate = document.createElement("th");
+    thDate.textContent = "Date";
+    headerRow.appendChild(thTitle);
+    headerRow.appendChild(thArtist);
+    headerRow.appendChild(thDate);
+
+    await songList.forEach(song => {
+        const row = table.insertRow();
+        const cellTitle = row.insertCell();
+        cellTitle.textContent = song.title;
+        const cellArtist = row.insertCell();
+        cellArtist.textContent = song.artist_name;
+        const cellDate = row.insertCell();
+        cellDate.textContent = song.release_date.split('T')[0];
+        row.addEventListener("click", () => click(song.id));
     });
 
-    // 이미지 회전 처리
-    const songImage = document.getElementById('song-image');
-    setInterval(() => {
-        if (isPlaying) {
-            songImage.style.transform = `rotate(${(parseInt(getComputedStyle(songImage).getPropertyValue('transform').split(',')[1]) + 0.1)}deg)`;
-        }
-    }, 100);
-});
+    songListContainer.appendChild(table);
+};
+
+
+
+playSong();

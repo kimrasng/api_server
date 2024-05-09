@@ -4,7 +4,6 @@ const path = require('path');
 const http = require('http');
 const mysql = require('mysql2/promise');
 const fs = require('fs');
-
 require('dotenv').config();
 
 const app = express();
@@ -37,7 +36,6 @@ app.get('/', (req, res) => {
     fs.readFile(mainPagePath, 'utf8', (err, data) => {
         if (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error', details: err.message });
             return;
         }
         res.send(data);
@@ -50,7 +48,6 @@ app.get('/api/music-server', (req, res) => {
     fs.readFile(songPagePath, 'utf8', (err, data) => {
         if (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error', details: err.message });
             return;
         }
         res.send(data);
@@ -59,45 +56,79 @@ app.get('/api/music-server', (req, res) => {
 
 // music-api/songs
 app.get('/api/music-server/songs', async (req, res) => {
+    const [rows] = await pool.query(`SELECT * FROM songs`);
+    res.json({ songs: rows });
+});
+
+app.get('/api/music-server/songs/:sort/:order', async (req, res) => {
     try {
-        let orderBy = req.query.orderBy || 'id';
-        const [rows] = await pool.query(`SELECT * FROM songs ORDER BY ${orderBy}`);
+        const { sort, order } = req.params;
+        let query;
+        let orderBy;
+        
+        switch (sort) {
+            case 'title':
+                orderBy = 'title';
+                break;
+            case 'artist':
+                orderBy = 'artist_name';
+                break;
+            case 'date':
+                orderBy = 'release_date';
+                break;
+            default:
+                return res.status(404).send('Not Found');
+        }
+        
+        switch (order) {
+            case 'asc':
+                query = `SELECT * FROM songs ORDER BY ${orderBy} ASC`;
+                break;
+            case 'desc':
+                query = `SELECT * FROM songs ORDER BY ${orderBy} DESC`;
+                break;
+            default:
+                return res.status(400).send('Error');
+        }
+        
+        const [rows] = await pool.query(query);
         res.json({ songs: rows });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        res.status(500).send('Error');
     }
 });
 
-// music-api/songs/:id/stream
-app.get('/api/music-server/songs/:id/stream', async (req, res) => {
-    const { id } = req.params;
 
-    try {
-        const [rows] = await pool.query('SELECT filename FROM songs WHERE id = ?', [id]);
-        const filename = rows[0].filename;
-        const filePath = path.join(__dirname, '/api/music_server/music', filename);
-
-        res.sendFile(filePath);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
-});
 
 // music-api/artists
 app.get('/api/music-server/artists', async (req, res) => {
-    try {
-        let orderBy = req.query.orderBy || 'id';
-        const [rows] = await pool.query(`SELECT * FROM artists ORDER BY ${orderBy}`);
-        res.json({ artists: rows });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
+    const [rows] = await pool.query(`SELECT * FROM artists`);
+    res.json({ artists: rows });
 });
 
-// HTTP server start
+app.get('/api/music-server/artists/:sort/', async (req, res) => {
+    const { sort } = req.params;
+    let query;
+    switch (sort) {
+        case 'name':
+            query = 'SELECT * FROM artists ORDER BY korean_name ASC';
+            break;
+        case 'date':
+            query = 'SELECT * FROM artists ORDER BY debut_date ASC';
+            break;
+        case 'foreign':
+            query = 'SELECT * FROM artists ORDER BY foreign_name ASC';
+            break;
+        default:
+            return res.status(404).send('Error');
+    }
+    const [rows] = await pool.query(query);
+    res.json({ songs: rows });
+});
+
+
+
 http.createServer(app).listen(PORT, () => {
     console.log(`HTTP server started on port ${PORT}`);
 });
