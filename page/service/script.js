@@ -9,7 +9,7 @@ let currentSort = 'artist';
 let currentOrder = 'asc';
 
 const fetchSongs = async () => {
-    const res = await fetch('https://api.kimrasng.kro.kr/api/music-server/songs');
+    const res = await fetch('https://api.kimrasng.kro.kr/api/music-server/songs/artist/asc');
     const data = await res.json();
     songList = data.songs;
     renderSongList();
