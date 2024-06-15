@@ -17,9 +17,9 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-router.use('/img/artist', express.static(path.join(__dirname, '//nas/music_server/img/artist')));
-router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img/song')));
-router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/music')));
+router.use('/img/artist', express.static(path.join(__dirname, '/home/kimrasng/nas/nasmusic_server/img/artist')));
+router.use('/img/song', express.static(path.join(__dirname, '/home/kimrasng/nas/music_server/img/song')));
+router.use('/music', express.static(path.join(__dirname, '/home/kimrasng/nas/music_server/music')));
 
 router.get('/', async (req, res) => {
     const mainPagePath = path.join(__dirname, '../page/music_server.html');

@@ -9,7 +9,7 @@ let currentSort = 'artist';
 let currentOrder = 'asc';
 
 const fetchSongs = async () => {
-    const res = await fetch('https://api.kimrasng.kro.kr/api/music-server/songs/artist/asc');
+    const res = await fetch('https://api.kimrasng.me/api/music-server/songs/artist/asc');
     const data = await res.json();
     songList = data.songs;
     renderSongList();
@@ -18,8 +18,8 @@ const fetchSongs = async () => {
 const click = (id) => {
     const song = songList.find(song => song.id === id);
     if (song) {
-        songAudio = `https://api.kimrasng.kro.kr/api/music-server/music/${song.filename}`;
-        songImage = `https://api.kimrasng.kro.kr/api/music-server/img/song/${song.image_filename}`;
+        songAudio = `https://api.kimrasng.me/api/music-server/music/${song.filename}`;
+        songImage = `https://api.kimrasng.me/api/music-server/img/song/${song.image_filename}`;
         songTitle = song.title;
         artistName = song.artist_name;
         renderCurrentSong();
@@ -50,7 +50,7 @@ const search = async () => {
 };
 
 const sortSongs = async (sort, order) => {
-    const res = await fetch(`https://api.kimrasng.kro.kr/api/music-server/songs/${sort}/${order}`);
+    const res = await fetch(`https://api.kimrasng.me/api/music-server/songs/${sort}/${order}`);
     const data = await res.json();
     songList = data.songs;
     renderSongList();
