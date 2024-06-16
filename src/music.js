@@ -16,8 +16,7 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
-
-router.use('/img/artist', express.static(path.join(__dirname, '//nas/music_server/img/artist')));
+router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img/artist')));
 router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img/song')));
 router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/music')));
 
