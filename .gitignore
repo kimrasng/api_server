@@ -3,4 +3,4 @@
 # Ignore dotenv files
 .env
 /src/ani.js
-node_module/
+node_modules/
