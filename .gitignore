@@ -2,4 +2,4 @@
 
 # Ignore dotenv files
 .env
-ani.js
+/src/ani.js
