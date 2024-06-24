@@ -10,7 +10,7 @@ let currentOrder = 'asc';
 let currentSongIndex = -1;
 
 const fetchSongs = async () => {
-    const res = await fetch(`https://api.kimrasng.me/api/music-server/songs/${currentSort}/${currentOrder}`);
+    const res = await fetch('https://api.kimrasng.me/api/music-server/songs/artist/asc');
     const data = await res.json();
     songList = data.songs;
     renderSongList();
@@ -44,18 +44,19 @@ if (audioPlayer) {
     });
 }
 
-const search = () => {
-    const filteredSongs = songList.filter(song =>
-        song.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+const search = async () => {
+    const filteredSongs = songList.filter(song => 
+        song.title.toLowerCase().includes(searchValue.toLowerCase()) || 
         song.artist_name.toLowerCase().includes(searchValue.toLowerCase())
     );
     renderSongList(filteredSongs);
 };
 
 const sortSongs = async (sort, order) => {
-    currentSort = sort;
-    currentOrder = order;
-    await fetchSongs();
+    const res = await fetch(`https://api.kimrasng.me/api/music-server/songs/${sort}/${order}`);
+    const data = await res.json();
+    songList = data.songs;
+    renderSongList();
 };
 
 const renderCurrentSong = () => {
@@ -91,7 +92,7 @@ const renderSongList = (songs = songList) => {
 
     const tableBody = table.createTBody();
 
-    songs.forEach((song, index) => {
+    songs.forEach((song) => {
         const row = tableBody.insertRow();
         const cellTitle = row.insertCell();
         cellTitle.textContent = song.title;
