@@ -7,17 +7,20 @@ let searchValue = "";
 let now;
 let currentSort = 'artist';
 let currentOrder = 'asc';
+let currentSongIndex = -1;
 
 const fetchSongs = async () => {
-    const res = await fetch('https://api.kimrasng.me/api/music-server/songs/artist/asc');
+    const res = await fetch(`https://api.kimrasng.me/api/music-server/songs/${currentSort}/${currentOrder}`);
     const data = await res.json();
     songList = data.songs;
     renderSongList();
 };
 
 const click = (id) => {
-    const song = songList.find(song => song.id === id);
-    if (song) {
+    const songIndex = songList.findIndex(song => song.id === id);
+    if (songIndex !== -1) {
+        currentSongIndex = songIndex;
+        const song = songList[songIndex];
         songAudio = `https://api.kimrasng.me/api/music-server/music/${song.filename}`;
         songImage = `https://api.kimrasng.me/api/music-server/img/song/${song.image_filename}`;
         songTitle = song.title;
@@ -27,33 +30,32 @@ const click = (id) => {
 };
 
 const audioPlayer = document.getElementById("audio-player");
-if(audioPlayer) {
+if (audioPlayer) {
     audioPlayer.addEventListener("ended", () => {
-        if (now === undefined) {
-            now = 0;
-        }
-        if (now < songList.length) {
-            click(songList[now].id);
-            now++;
-        } else {
-            now = 0;
+        if (currentSongIndex !== -1 && currentSongIndex < songList.length - 1) {
+            currentSongIndex++;
+            const nextSong = songList[currentSongIndex];
+            songAudio = `https://api.kimrasng.me/api/music-server/music/${nextSong.filename}`;
+            songImage = `https://api.kimrasng.me/api/music-server/img/song/${nextSong.image_filename}`;
+            songTitle = nextSong.title;
+            artistName = nextSong.artist_name;
+            renderCurrentSong();
         }
     });
 }
 
-const search = async () => {
-    const filteredSongs = songList.filter(song => 
-        song.title.toLowerCase().includes(searchValue.toLowerCase()) || 
+const search = () => {
+    const filteredSongs = songList.filter(song =>
+        song.title.toLowerCase().includes(searchValue.toLowerCase()) ||
         song.artist_name.toLowerCase().includes(searchValue.toLowerCase())
     );
     renderSongList(filteredSongs);
 };
 
 const sortSongs = async (sort, order) => {
-    const res = await fetch(`https://api.kimrasng.me/api/music-server/songs/${sort}/${order}`);
-    const data = await res.json();
-    songList = data.songs;
-    renderSongList();
+    currentSort = sort;
+    currentOrder = order;
+    await fetchSongs();
 };
 
 const renderCurrentSong = () => {
@@ -65,7 +67,7 @@ const renderCurrentSong = () => {
 
 const renderSongList = (songs = songList) => {
     const songListContainer = document.getElementById("song-list");
-    if(!songListContainer) return;
+    if (!songListContainer) return;
 
     songListContainer.innerHTML = "";
 
@@ -76,16 +78,21 @@ const renderSongList = (songs = songList) => {
     const headerRow = tableHeader.insertRow();
     const thTitle = document.createElement("th");
     thTitle.textContent = "Title";
+    thTitle.addEventListener("click", () => sortSongs('title', currentOrder === 'asc' ? 'desc' : 'asc'));
     const thArtist = document.createElement("th");
     thArtist.textContent = "Artist";
+    thArtist.addEventListener("click", () => sortSongs('artist', currentOrder === 'asc' ? 'desc' : 'asc'));
     const thDate = document.createElement("th");
     thDate.textContent = "Date";
+    thDate.addEventListener("click", () => sortSongs('release_date', currentOrder === 'asc' ? 'desc' : 'asc'));
     headerRow.appendChild(thTitle);
     headerRow.appendChild(thArtist);
     headerRow.appendChild(thDate);
 
-    songs.forEach(song => {
-        const row = table.insertRow();
+    const tableBody = table.createTBody();
+
+    songs.forEach((song, index) => {
+        const row = tableBody.insertRow();
         const cellTitle = row.insertCell();
         cellTitle.textContent = song.title;
         const cellArtist = row.insertCell();
@@ -97,5 +104,10 @@ const renderSongList = (songs = songList) => {
 
     songListContainer.appendChild(table);
 };
+
+document.getElementById("search-input").addEventListener("input", (event) => {
+    searchValue = event.target.value;
+    search();
+});
 
 fetchSongs();
