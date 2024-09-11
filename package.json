@@ -15,8 +15,7 @@
     "dotenv": "^16.4.4",
     "express": "^4.18.2",
     "express-session": "^1.18.0",
-    "lru-cache": "^10.2.0",
-    "moment": "^2.30.1",
-    "mysql2": "^2.2.5"
+    "mysql2": "^2.2.5",
+    "youtube-dl-exec": "^3.0.7"
   }
 }

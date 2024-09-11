@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const musicRouter = require('./src/music');
-const aniRouter = require('./src/ani');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
@@ -10,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const PORT = 4000;
 
+const musicRouter = require('./src/music');
+const aniRouter = require('./src/ani');
+const ytdlRouter = require('./src/ytdl');
 
 app.use(cors());
 
@@ -30,8 +31,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/music-server', musicRouter);
-
 app.use('/api/ani-server', aniRouter);
+app.use('/api/ytdl', ytdlRouter);
 
 http.createServer(app).listen(PORT, () => {
     console.log(`HTTP server started on port ${PORT}`);

@@ -4,3 +4,4 @@
 .env
 /src/ani.js
 node_modules/
+data/
