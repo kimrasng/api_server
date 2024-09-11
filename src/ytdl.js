@@ -6,16 +6,13 @@ const ytdlp = require('youtube-dl-exec');
 const router = express.Router();
 const rootPath = path.dirname(require.main.filename);
 
-// Ensure the download directory exists
 const downloadDir = path.join(rootPath, 'data', 'ytdl');
 if (!fs.existsSync(downloadDir)) {
     fs.mkdirSync(downloadDir, { recursive: true });
 }
 
-// Validate YouTube video ID
 const isValidVideoId = id => /^[a-zA-Z0-9_-]{11}$/.test(id);
 
-// Download file endpoint
 router.get('/download', (req, res) => {
     const { file } = req.query;
 
@@ -37,7 +34,6 @@ router.get('/download', (req, res) => {
     });
 });
 
-// YouTube download endpoint
 router.get('/', async (req, res) => {
     const start = Date.now();
     const { id, filetype } = req.query;
@@ -83,13 +79,10 @@ router.get('/', async (req, res) => {
 
     try {
         const subprocess = ytdlp.exec(url, options);
-        subprocess.on('error', error => {
-            res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: error.message });
-        });
+        let filePath;
 
         subprocess.stdout.on('data', data => {
             const text = data.toString();
-            let filePath;
 
             if (filetype === 'audio') {
                 if (text.includes('[ExtractAudio]')) {
@@ -103,6 +96,7 @@ router.get('/', async (req, res) => {
 
             if (filePath) {
                 const fileName = path.basename(filePath);
+                fs.renameSync(filePath, outputPath);
                 console.log(`[ytdl] ${fileName} downloaded.`);
                 res.status(200).json({
                     code: 200,
@@ -110,11 +104,22 @@ router.get('/', async (req, res) => {
                     data: {
                         url: `/api/ytdl/download?file=${fileName}`,
                         cached: false,
-                        expiration: `${1000 * 60 * 60 * 2}ms`, // 2 hours
+                        expiration: `${1000 * 60 * 60 * 2}ms`,
                     },
                 });
             }
         });
+
+        subprocess.on('error', error => {
+            res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: error.message });
+        });
+
+        subprocess.on('exit', code => {
+            if (code !== 0) {
+                res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: '다운로드 프로세스가 실패했습니다.' });
+            }
+        });
+
     } catch (error) {
         res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: error.message });
     }
