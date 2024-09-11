@@ -34,7 +34,7 @@ router.get('/download', (req, res) => {
     });
 });
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
     const start = Date.now();
     const { id, filetype } = req.query;
 
@@ -79,11 +79,11 @@ router.get('/', async (req, res) => {
 
     try {
         const subprocess = ytdlp.exec(url, options);
+
         let filePath;
 
         subprocess.stdout.on('data', data => {
             const text = data.toString();
-
             if (filetype === 'audio') {
                 if (text.includes('[ExtractAudio]')) {
                     filePath = text.split(' /').find(line => line.endsWith('mp3')).trim();
@@ -96,26 +96,37 @@ router.get('/', async (req, res) => {
 
             if (filePath) {
                 const fileName = path.basename(filePath);
-                fs.renameSync(filePath, outputPath);
-                console.log(`[ytdl] ${fileName} downloaded.`);
-                res.status(200).json({
-                    code: 200,
-                    time: `${Date.now() - start}ms`,
-                    data: {
-                        url: `/api/ytdl/download?file=${fileName}`,
-                        cached: false,
-                        expiration: `${1000 * 60 * 60 * 2}ms`,
-                    },
+                fs.rename(filePath, outputPath, err => {
+                    if (err) {
+                        console.error('File move error:', err);
+                        return res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: '파일 이동 중 오류 발생.' });
+                    }
+                    console.log(`[ytdl] ${fileName} downloaded successfully.`);
+                    res.status(200).json({
+                        code: 200,
+                        time: `${Date.now() - start}ms`,
+                        data: {
+                            url: `/api/ytdl/download?file=${fileName}`,
+                            cached: false,
+                            expiration: `${1000 * 60 * 60 * 2}ms`,
+                        },
+                    });
                 });
             }
         });
 
+        subprocess.stderr.on('data', data => {
+            console.error(`stderr: ${data.toString()}`);
+        });
+
         subprocess.on('error', error => {
-            res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: error.message });
+            console.error('Subprocess error:', error);
+            res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: '다운로드 프로세스에서 오류가 발생했습니다.' });
         });
 
         subprocess.on('exit', code => {
             if (code !== 0) {
+                console.error(`Subprocess exited with code ${code}`);
                 res.status(500).json({ code: 500, time: `${Date.now() - start}ms`, errorMessage: '다운로드 프로세스가 실패했습니다.' });
             }
         });

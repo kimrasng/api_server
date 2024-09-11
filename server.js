@@ -14,17 +14,15 @@ const ytdlRouter = require('./src/ytdl');
 
 app.use(cors());
 
-// 페이지 연결
 app.use('/service/', express.static(path.join(__dirname, '/page/service')));
 app.use('/document/', express.static(path.join(__dirname, '/page/document')));
 
-// Main page
 app.get('/', (req, res) => {
     const mainPagePath = path.join(__dirname, './page/main.html');
     fs.readFile(mainPagePath, 'utf8', (err, data) => {
         if (err) {
-            console.error(err);
-            return;
+            console.error('Error reading main page:', err);
+            return res.status(500).send('Internal Server Error');
         }
         res.send(data);
     });
@@ -33,6 +31,11 @@ app.get('/', (req, res) => {
 app.use('/api/music-server', musicRouter);
 app.use('/api/ani-server', aniRouter);
 app.use('/api/ytdl', ytdlRouter);
+
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({ code: 500, errorMessage: 'Internal Server Error' });
+});
 
 http.createServer(app).listen(PORT, () => {
     console.log(`HTTP server started on port ${PORT}`);
