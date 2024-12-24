@@ -6,7 +6,7 @@ let songAudio
 let searchValue = ""
 let now
 let currentSort = 'artist'
-let currentOrder = 'asc'
+let currentOrder = 'desc'
 let currentSongIndex = -1
 
 const fetchSongs = async () => {
@@ -46,8 +46,9 @@ if (audioPlayer) {
 
 const search = async () => {
     const filteredSongs = songList.filter(song => 
-        song.title.toLowerCase().includes(searchValue.toLowerCase()) || 
-        song.artist_name.toLowerCase().includes(searchValue.toLowerCase())
+        song.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+        (song.title_eng && song.title_eng.toLowerCase().includes(searchValue.toLowerCase())) ||
+        (song.title_korean && song.title_korean.toLowerCase().includes(searchValue.toLowerCase()))
     )
     renderSongList(filteredSongs)
 }
@@ -85,7 +86,7 @@ const renderSongList = (songs = songList) => {
     thArtist.addEventListener("click", () => sortSongs('artist', currentOrder === 'asc' ? 'desc' : 'asc'))
     const thDate = document.createElement("th")
     thDate.textContent = "Date"
-    thDate.addEventListener("click", () => sortSongs('release_date', currentOrder === 'asc' ? 'desc' : 'asc'))
+    thDate.addEventListener("click", () => sortSongs('date', currentOrder === 'asc' ? 'desc' : 'asc'))
     headerRow.appendChild(thTitle)
     headerRow.appendChild(thArtist)
     headerRow.appendChild(thDate)
