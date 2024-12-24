@@ -16,9 +16,9 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 })
-router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img/artist')))
-router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img/song')))
-router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/music')))
+router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
+router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
+router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/songs')))
 
 router.get('/', async (req, res) => {
     const mainPagePath = path.join(__dirname, '../page/music_server.html')
