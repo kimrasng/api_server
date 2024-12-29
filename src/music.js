@@ -17,6 +17,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 })
 router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
+router.use('/img/album', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
 router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
 router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/songs')))
 
@@ -100,6 +101,50 @@ router.get('/artists/:sort/', async (req, res) => {
     }
     const [rows] = await pool.query(query)
     res.json({ songs: rows })
+})
+
+router.get('/albums', async (req, res) => {
+    const [rows] = await pool.query(`SELECT * FROM albums`)
+    res.json({ albums: rows })
+})
+
+router.get('/albums/:sort/:order', async (req, res) => {
+    try {
+        const { sort, order } = req.params
+        let query
+        let orderBy
+        
+        switch (sort) {
+            case 'title':
+                orderBy = 'title'
+                break
+            case 'artist':
+                orderBy = 'artist_id'
+                break
+            case 'date':
+                orderBy = 'release_date'
+                break
+            default:
+                return res.status(404).send('Not Found')
+        }
+        
+        switch (order) {
+            case 'asc':
+                query = `SELECT * FROM albums ORDER BY ${orderBy} ASC`
+                break
+            case 'desc':
+                query = `SELECT * FROM albums ORDER BY ${orderBy} DESC`
+                break
+            default:
+                return res.status(400).send('Error')
+        }
+        
+        const [rows] = await pool.query(query)
+        res.json({ albums: rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Error')
+    }
 })
 
 module.exports = router
