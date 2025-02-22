@@ -9,7 +9,7 @@ const app = express()
 const PORT = 3000
 
 const musicRouter = require('./src/music')
-const aniRouter = require('./src/ani')
+// const aniRouter = require('./src/ani')
 
 app.use(cors())
 
