@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/music-server', musicRouter)
-app.use('/api/ani-server', aniRouter)
+// app.use('/api/ani-server', aniRouter)
 
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err)
