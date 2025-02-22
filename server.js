@@ -6,7 +6,7 @@ const fs = require('fs')
 require('dotenv').config()
 
 const app = express()
-const PORT = 4000
+const PORT = 3000
 
 const musicRouter = require('./src/music')
 const aniRouter = require('./src/ani')
