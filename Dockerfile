@@ -1,23 +1,16 @@
-# syntax=docker/dockerfile:1
+FROM node:14
 
-ARG NODE_VERSION=22.13.1
+# MySQL 설치
+RUN apt-get update && apt-get install -y mysql-server
 
-FROM node:${NODE_VERSION}-alpine
-
-# Set the working directory
+# 작업 디렉토리 설정
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --omit=dev
-
-# Copy the rest of the application source code
+# 애플리케이션 코드 복사
 COPY . .
 
-# Expose the port that the application listens on
-EXPOSE 3000
+# 애플리케이션 종속성 설치
+RUN npm install
 
-# Run the application
-CMD ["npm", "start"]
+# MySQL 서버 시작
+CMD service mysql start && npm start

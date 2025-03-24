@@ -1,16 +1,28 @@
+version: '3.8'
+
 services:
   api_server:
     build: .
     ports:
       - "4000:3000"
+      - "3306:3306"
     environment:
       NODE_ENV: production
+    depends_on:
+      - mysql
+    command: sh -c "service mysql start && npm start"
+
+  mysql:
+    image: mysql:8.0
+    environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: music_db
       MYSQL_USER: api
       MYSQL_PASSWORD: api_pass_2312
+    ports:
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql 
+      - mysql_data:/var/lib/mysql
 
 volumes:
   mysql_data:
