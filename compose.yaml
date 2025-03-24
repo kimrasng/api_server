@@ -12,7 +12,7 @@ services:
     command: sh -c "service mysql start && npm start"
 
   mysql:
-    image: mysql:8.0
+    image: mysql:lastest
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: music_db
