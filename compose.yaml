@@ -5,6 +5,7 @@ services:
     environment:
       NODE_ENV: production
     ports:
+<<<<<<< HEAD
       - 3000:3000
 
   mysql:
@@ -22,3 +23,7 @@ services:
 volumes:
   mysql_data:
     driver: local
+=======
+      - "3000:3000"
+    network_mode: "host"  
+>>>>>>> 5a87ba0d7f405c2c5f1d7861966f393fb179857c
