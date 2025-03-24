@@ -16,6 +16,7 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 })
+
 router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
 router.use('/img/album', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
 router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
     fs.readFile(mainPagePath, 'utf8', (err, data) => {
         if (err) {
             console.error(err)
-            return
+            return res.status(500).send('Error reading main page')
         }
         res.send(data)
     })
@@ -34,8 +35,13 @@ router.get('/', async (req, res) => {
 
 // music-api/songs
 router.get('/songs', async (req, res) => {
-    const [rows] = await pool.query(`SELECT * FROM songs`)
-    res.json({ songs: rows })
+    try {
+        const [rows] = await pool.query(`SELECT * FROM songs`)
+        res.json({ songs: rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Error fetching songs')
+    }
 })
 
 router.get('/songs/:sort/:order', async (req, res) => {
@@ -66,46 +72,61 @@ router.get('/songs/:sort/:order', async (req, res) => {
                 query = `SELECT * FROM songs ORDER BY ${orderBy} DESC`
                 break
             default:
-                return res.status(400).send('Error')
+                return res.status(400).send('Invalid order parameter')
         }
         
         const [rows] = await pool.query(query)
         res.json({ songs: rows })
     } catch (error) {
         console.error(error)
-        res.status(500).send('Error')
+        res.status(500).send('Error fetching sorted songs')
     }
 })
 
 // music-api/artists
 router.get('/artists', async (req, res) => {
-    const [rows] = await pool.query(`SELECT * FROM artists`)
-    res.json({ artists: rows })
+    try {
+        const [rows] = await pool.query(`SELECT * FROM artists`)
+        res.json({ artists: rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Error fetching artists')
+    }
 })
 
-router.get('/artists/:sort/', async (req, res) => {
-    const { sort } = req.params
-    let query
-    switch (sort) {
-        case 'name':
-            query = 'SELECT * FROM artists ORDER BY korean_name ASC'
-            break
-        case 'date':
-            query = 'SELECT * FROM artists ORDER BY debut_date ASC'
-            break
-        case 'foreign':
-            query = 'SELECT * FROM artists ORDER BY foreign_name ASC'
-            break
-        default:
-            return res.status(404).send('Error')
+router.get('/artists/:sort', async (req, res) => {
+    try {
+        const { sort } = req.params
+        let query
+        switch (sort) {
+            case 'name':
+                query = 'SELECT * FROM artists ORDER BY korean_name ASC'
+                break
+            case 'date':
+                query = 'SELECT * FROM artists ORDER BY debut_date ASC'
+                break
+            case 'foreign':
+                query = 'SELECT * FROM artists ORDER BY foreign_name ASC'
+                break
+            default:
+                return res.status(404).send('Not Found')
+        }
+        const [rows] = await pool.query(query)
+        res.json({ artists: rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Error fetching sorted artists')
     }
-    const [rows] = await pool.query(query)
-    res.json({ songs: rows })
 })
 
 router.get('/albums', async (req, res) => {
-    const [rows] = await pool.query(`SELECT * FROM albums`)
-    res.json({ albums: rows })
+    try {
+        const [rows] = await pool.query(`SELECT * FROM albums`)
+        res.json({ albums: rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Error fetching albums')
+    }
 })
 
 router.get('/albums/:sort/:order', async (req, res) => {
@@ -136,14 +157,14 @@ router.get('/albums/:sort/:order', async (req, res) => {
                 query = `SELECT * FROM albums ORDER BY ${orderBy} DESC`
                 break
             default:
-                return res.status(400).send('Error')
+                return res.status(400).send('Invalid order parameter')
         }
         
         const [rows] = await pool.query(query)
         res.json({ albums: rows })
     } catch (error) {
         console.error(error)
-        res.status(500).send('Error')
+        res.status(500).send('Error fetching sorted albums')
     }
 })
 
