@@ -11,7 +11,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: api
+      MYSQL_DATABASE: music_db
       MYSQL_USER: api
       MYSQL_PASSWORD: api_pass_2312
     ports:
