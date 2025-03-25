@@ -17,10 +17,18 @@ const pool = mysql.createPool({
     queueLimit: 0
 })
 
-router.use('/img/artist', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
-router.use('/img/album', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
-router.use('/img/song', express.static(path.join(__dirname, '/../../../../nas/music_server/img')))
-router.use('/music', express.static(path.join(__dirname, '/../../../../nas/music_server/songs')))
+router.use('/img/artist', (req, res) => {
+    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+})
+router.use('/img/album', (req, res) => {
+    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+})
+router.use('/img/song', (req, res) => {
+    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+})
+router.use('/music', (req, res) => {
+    res.redirect(`https://storage.kimrasng.me/music_server/songs${req.path}`)
+})
 
 router.get('/', async (req, res) => {
     const mainPagePath = path.join(__dirname, '../page/music_server.html')
