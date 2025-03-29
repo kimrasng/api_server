@@ -9,8 +9,6 @@ const PORT = 3000
 
 const musicRouter = require('./src/music')
 const test = require('./src/test')
-const admin = require('./src/admin')
-const login = require('./src/login')
 // const aniRouter = require('./src/ani')
 
 app.use(cors())
@@ -32,8 +30,6 @@ app.get('/', (req, res) => {
 app.use('/api/music-server', musicRouter)
 // app.use('/api/ani-server', aniRouter)
 app.use('/api/test', test)
-app.use('/api/admin', admin)
-app.use('/account/login', login)
 
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err)
