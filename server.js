@@ -1,6 +1,5 @@
 const express = require('express')
 const cors = require('cors')
-const http = require('http')
 const path = require('path')
 const fs = require('fs')
 require('dotenv').config()
@@ -10,6 +9,8 @@ const PORT = 3000
 
 const musicRouter = require('./src/music')
 const test = require('./src/test')
+const admin = require('./src/admin')
+const login = require('./src/login')
 // const aniRouter = require('./src/ani')
 
 app.use(cors())
@@ -31,12 +32,15 @@ app.get('/', (req, res) => {
 app.use('/api/music-server', musicRouter)
 // app.use('/api/ani-server', aniRouter)
 app.use('/api/test', test)
+app.use('/api/admin', admin)
+app.use('/account/login', login)
 
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err)
     res.status(500).json({ code: 500, errorMessage: 'Internal Server Error' })
 })
 
-http.createServer(app).listen(PORT, () => {
-    console.log(`HTTP server started on port ${PORT}`)
+// app.listen을 사용하여 서버 실행
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`)
 })
