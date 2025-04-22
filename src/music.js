@@ -18,16 +18,16 @@ const pool = mysql.createPool({
 })
 
 router.use('/img/artist', (req, res) => {
-    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+    res.redirect(`https://storage.kimrasng.kr/music_server/img${req.path}`)
 })
 router.use('/img/album', (req, res) => {
-    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+    res.redirect(`https://storage.kimrasng.kr/music_server/img${req.path}`)
 })
 router.use('/img/song', (req, res) => {
-    res.redirect(`https://storage.kimrasng.me/music_server/img${req.path}`)
+    res.redirect(`https://storage.kimrasng.kr/music_server/img${req.path}`)
 })
 router.use('/music', (req, res) => {
-    res.redirect(`https://storage.kimrasng.me/music_server/songs${req.path}`)
+    res.redirect(`https://storage.kimrasng.kr/music_server/songs${req.path}`)
 })
 
 router.get('/', async (req, res) => {
