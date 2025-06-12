@@ -13,7 +13,7 @@ const test = require('./src/test')
 
 app.use(cors())
 
-app.use('/service/', express.static(path.join(__dirname, '/page/service')))
+// app.use('/service/', express.static(path.join(__dirname, '/page/service')))
 app.use('/document/', express.static(path.join(__dirname, '/page/document')))
 
 app.get('/', (req, res) => {
