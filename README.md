@@ -1,1 +1,1 @@
-https://api.kimrasng.me
+https://api.kimrasng.kr
