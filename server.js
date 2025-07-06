@@ -12,11 +12,7 @@ const test = require('./src/test')
 
 app.use(cors())
 
-<<<<<<< HEAD
-// app.use('/service/', express.static(path.join(__dirname, '/page/service')))
-=======
 app.use('/service/', express.static(path.join('https://music.kimrasng.kr')))
->>>>>>> e590482 (Remove unused files and update server configuration)
 app.use('/document/', express.static(path.join(__dirname, '/page/document')))
 
 app.get('/', (req, res) => {
