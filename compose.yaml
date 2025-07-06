@@ -16,6 +16,7 @@ services:
       - mysql
     command: npm start
 
+<<<<<<< HEAD
   mysql:
     image: mysql:8.0
     container_name: api-mysql
@@ -28,6 +29,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+=======
+>>>>>>> e590482 (Remove unused files and update server configuration)
 volumes:
   mysql_data:
     driver: local

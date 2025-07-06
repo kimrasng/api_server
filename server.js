@@ -9,11 +9,14 @@ const PORT = 3000
 
 const musicRouter = require('./src/music')
 const test = require('./src/test')
-// const aniRouter = require('./src/ani')
 
 app.use(cors())
 
+<<<<<<< HEAD
 // app.use('/service/', express.static(path.join(__dirname, '/page/service')))
+=======
+app.use('/service/', express.static(path.join('https://music.kimrasng.kr')))
+>>>>>>> e590482 (Remove unused files and update server configuration)
 app.use('/document/', express.static(path.join(__dirname, '/page/document')))
 
 app.get('/', (req, res) => {
