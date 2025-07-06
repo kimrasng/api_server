@@ -5,33 +5,4 @@ services:
     build: .
     ports:
       - "4000:3000"
-    environment:
-      NODE_ENV: production
-      DB_HOST: mysql
-      DB_USER: api
-      DB_PASSWORD: api_pass_2312
-      DB_DATABASE: music_db
-      DB_PORT: 3306
-    depends_on:
-      - mysql
     command: npm start
-
-<<<<<<< HEAD
-  mysql:
-    image: mysql:8.0
-    container_name: api-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: music_db
-      MYSQL_USER: api
-      MYSQL_PASSWORD: api_pass_2312
-    ports: []
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-=======
->>>>>>> e590482 (Remove unused files and update server configuration)
-volumes:
-  mysql_data:
-    driver: local
-
