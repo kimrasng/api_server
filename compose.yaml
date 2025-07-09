@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: mysql:5.7
+    image: arm64v8/mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: api_db
